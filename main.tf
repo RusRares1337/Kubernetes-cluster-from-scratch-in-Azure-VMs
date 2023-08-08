@@ -63,29 +63,29 @@ resource "azurerm_public_ip" "publicIP1" {
   name                = "1stPublicIP"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
   depends_on = [
     azurerm_resource_group.rg
   ]
 }
 
-# Create 1st public IP
+# Create 2nd public IP
 resource "azurerm_public_ip" "publicIP2" {
   name                = "2ndPublicIP"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
   depends_on = [
     azurerm_resource_group.rg
   ]
 }
 
-# Create 1st public IP
+# Create 3rd public IP
 resource "azurerm_public_ip" "publicIP3" {
   name                = "3rdPublicIP"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
   depends_on = [
     azurerm_resource_group.rg
   ]
@@ -147,20 +147,50 @@ resource "azurerm_network_interface" "nic3" {
   ]
 }
 
+# Create network security group
+resource "azurerm_network_security_group" "nsg" {
+  name                = "ssh_nsg"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "allow_ssh_sg"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_network_interface_security_group_association" "association1" {
+  network_interface_id      = azurerm_network_interface.nic1.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
+resource "azurerm_network_interface_security_group_association" "association2" {
+  network_interface_id      = azurerm_network_interface.nic2.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
+resource "azurerm_network_interface_security_group_association" "association3" {
+  network_interface_id      = azurerm_network_interface.nic3.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
 
 # Create 1st virtual machine
 resource "azurerm_linux_virtual_machine" "vm1" {
-  name                  = "vm-we-01"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.nic1.id]
-  size                  = "Standard_DS1_v2"
-  admin_username        = "adminuser"
+  name                            = "vm-we-01"
+  location                        = azurerm_resource_group.rg.location
+  resource_group_name             = azurerm_resource_group.rg.name
+  network_interface_ids           = [azurerm_network_interface.nic1.id]
+  size                            = "Standard_DS1_v2"
+  admin_username                  = "adminuser"
+  disable_password_authentication = true
 
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = tls_private_key.linux_key.public_key_openssh
-  }
   os_disk {
     name                 = "OsDisk1"
     caching              = "ReadWrite"
@@ -175,24 +205,51 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   }
 
   depends_on = [
-    azurerm_network_interface.nic1,
-    tls_private_key.linux_key
+    azurerm_network_interface.nic1
   ]
-}
-
-# Create 2nd virtual machine
-resource "azurerm_linux_virtual_machine" "vm2" {
-  name                  = "vm-we-02"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.nic2.id]
-  size                  = "Standard_DS1_v2"
-  admin_username        = "adminuser"
 
   admin_ssh_key {
     username   = "adminuser"
     public_key = tls_private_key.linux_key.public_key_openssh
   }
+
+  connection {
+    type        = "ssh"
+    user        = "adminuser"
+    private_key = tls_private_key.linux_key.private_key_pem
+    host        = azurerm_public_ip.publicIP1.ip_address
+
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/playbook.yaml"
+    destination = "/home/adminuser/playbook.yaml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/install.sh"
+    destination = "/home/adminuser/install.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod +x /home/adminuser/install.sh",
+      "sudo /home/adminuser/install.sh",
+      "sudo chmod 666 /var/run/docker.sock",
+    ]
+  }
+}
+
+# Create 2nd virtual machine
+resource "azurerm_linux_virtual_machine" "vm2" {
+  name                            = "vm-we-02"
+  location                        = azurerm_resource_group.rg.location
+  resource_group_name             = azurerm_resource_group.rg.name
+  network_interface_ids           = [azurerm_network_interface.nic2.id]
+  size                            = "Standard_DS1_v2"
+  admin_username                  = "adminuser"
+  disable_password_authentication = true
+
   os_disk {
     name                 = "OsDisk2"
     caching              = "ReadWrite"
@@ -207,24 +264,52 @@ resource "azurerm_linux_virtual_machine" "vm2" {
   }
 
   depends_on = [
+    azurerm_linux_virtual_machine.vm1,
     azurerm_network_interface.nic2,
-    tls_private_key.linux_key
   ]
-}
-
-# Create 3rd virtual machine
-resource "azurerm_linux_virtual_machine" "vm3" {
-  name                  = "vm-we-03"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.nic3.id]
-  size                  = "Standard_DS1_v2"
-  admin_username        = "adminuser"
 
   admin_ssh_key {
     username   = "adminuser"
     public_key = tls_private_key.linux_key.public_key_openssh
   }
+
+  connection {
+    type        = "ssh"
+    user        = "adminuser"
+    private_key = tls_private_key.linux_key.private_key_pem
+    host        = azurerm_public_ip.publicIP2.ip_address
+
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/playbook.yaml"
+    destination = "/home/adminuser/playbook.yaml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/install.sh"
+    destination = "/home/adminuser/install.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod +x /home/adminuser/install.sh",
+      "sudo /home/adminuser/install.sh",
+      "sudo chmod 666 /var/run/docker.sock",
+    ]
+  }
+}
+
+# Create 3rd virtual machine
+resource "azurerm_linux_virtual_machine" "vm3" {
+  name                            = "vm-we-03"
+  location                        = azurerm_resource_group.rg.location
+  resource_group_name             = azurerm_resource_group.rg.name
+  network_interface_ids           = [azurerm_network_interface.nic3.id]
+  size                            = "Standard_DS1_v2"
+  admin_username                  = "adminuser"
+  disable_password_authentication = true
+
   os_disk {
     name                 = "OsDisk3"
     caching              = "ReadWrite"
@@ -237,8 +322,41 @@ resource "azurerm_linux_virtual_machine" "vm3" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
+
   depends_on = [
+    azurerm_linux_virtual_machine.vm2,
     azurerm_network_interface.nic3,
-    tls_private_key.linux_key
   ]
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = tls_private_key.linux_key.public_key_openssh
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "adminuser"
+    private_key = tls_private_key.linux_key.private_key_pem
+    host        = azurerm_public_ip.publicIP3.ip_address
+
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/playbook.yaml"
+    destination = "/home/adminuser/playbook.yaml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/install.sh"
+    destination = "/home/adminuser/install.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod +x /home/adminuser/install.sh",
+      "sudo /home/adminuser/install.sh",
+      "sudo chmod 666 /var/run/docker.sock",
+    ]
+  }
 }
+
