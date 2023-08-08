@@ -1,0 +1,17 @@
+# local .terraform directories
+**/.terraform/*
+
+# tf state files 
+*.tfstate
+*.tfstate.*
+
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore MacOs system file
+.DS_store
+
+# Ignore crash logs
+crash.log
