@@ -49,7 +49,7 @@
       pip:
         name: docker
 
-        - name: Starting docker service
+    - name: Starting docker service
       service:
         name: docker
         state: started
