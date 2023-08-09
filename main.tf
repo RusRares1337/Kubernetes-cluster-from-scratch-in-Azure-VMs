@@ -149,18 +149,40 @@ resource "azurerm_network_interface" "nic3" {
 
 # Create network security group
 resource "azurerm_network_security_group" "nsg" {
-  name                = "ssh_nsg"
+  name                = "nsg-01"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   security_rule {
-    name                       = "allow_ssh_sg"
+    name                       = "allow_ssh"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "allow_http"
+    priority                   = 110
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "allow_https"
+    priority                   = 120
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -233,6 +255,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
 
   provisioner "remote-exec" {
     inline = [
+      "sed -i -e 's/\r$//' install.sh",
       "sudo chmod +x /home/adminuser/install.sh",
       "sudo /home/adminuser/install.sh",
       "sudo chmod 666 /var/run/docker.sock",
@@ -293,6 +316,7 @@ resource "azurerm_linux_virtual_machine" "vm2" {
 
   provisioner "remote-exec" {
     inline = [
+      "sed -i -e 's/\r$//' install.sh",
       "sudo chmod +x /home/adminuser/install.sh",
       "sudo /home/adminuser/install.sh",
       "sudo chmod 666 /var/run/docker.sock",
@@ -353,10 +377,10 @@ resource "azurerm_linux_virtual_machine" "vm3" {
 
   provisioner "remote-exec" {
     inline = [
+      "sed -i -e 's/\r$//' install.sh",
       "sudo chmod +x /home/adminuser/install.sh",
       "sudo /home/adminuser/install.sh",
       "sudo chmod 666 /var/run/docker.sock",
     ]
   }
 }
-
