@@ -6,7 +6,7 @@ sudo apt install -y ansible;
 sleep 3;
 echo "Ansible installed"
 
-#echo "Generate and send public key to remote servers"
+#echo "Generate and send public key to workers"
 #sudo ssh-keygen -t rsa
 #ssh-copy-id adminuser@10.0.1.4
 #ssh-copy-id adminuser@10.0.2.4
