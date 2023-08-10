@@ -192,7 +192,7 @@ resource "azurerm_network_security_group" "nsg" {
     priority                   = 130
     direction                  = "Inbound"
     access                     = "Allow"
-    protocol                   = "ICMP"
+    protocol                   = "Icmp"
     source_port_range          = "*"
     destination_port_range     = "*"
     source_address_prefix      = "*"
@@ -217,11 +217,11 @@ resource "azurerm_network_interface_security_group_association" "association3" {
 
 # Create 1st virtual machine
 resource "azurerm_linux_virtual_machine" "vm1" {
-  name                            = "vm-we-01"
+  name                            = "master-node"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic1.id]
-  size                            = "Standard_DS1_v2"
+  size                            = "Standard_D2s_v3"
   admin_username                  = "adminuser"
   disable_password_authentication = true
 
@@ -256,8 +256,28 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   }
 
   provisioner "file" {
-    source      = "./Ansible/playbook.yaml"
-    destination = "/home/adminuser/playbook.yaml"
+  source      = "./Ansible/initial.yml"
+  destination = "/home/adminuser/initial.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/kube-dependecies.yml"
+    destination = "/home/adminuser/kube-dependecies.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/hosts"
+    destination = "/home/adminuser/hosts"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/master.yml"
+    destination = "/home/adminuser/master.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/workers.yml"
+    destination = "/home/adminuser/workers.yml"
   }
 
   provisioner "file" {
@@ -265,19 +285,19 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     destination = "/home/adminuser/install.sh"
   }
 
+
   provisioner "remote-exec" {
     inline = [
       "sed -i -e 's/\r$//' install.sh",
       "sudo chmod +x /home/adminuser/install.sh",
       "sudo /home/adminuser/install.sh",
-      "sudo chmod 666 /var/run/docker.sock",
     ]
   }
 }
 
 # Create 2nd virtual machine
 resource "azurerm_linux_virtual_machine" "vm2" {
-  name                            = "vm-we-02"
+  name                            = "worker-1"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic2.id]
@@ -317,8 +337,28 @@ resource "azurerm_linux_virtual_machine" "vm2" {
   }
 
   provisioner "file" {
-    source      = "./Ansible/playbook.yaml"
-    destination = "/home/adminuser/playbook.yaml"
+  source      = "./Ansible/initial.yml"
+  destination = "/home/adminuser/initial.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/kube-dependecies.yml"
+    destination = "/home/adminuser/kube-dependecies.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/hosts"
+    destination = "/home/adminuser/hosts"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/master.yml"
+    destination = "/home/adminuser/master.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/workers.yml"
+    destination = "/home/adminuser/workers.yml"
   }
 
   provisioner "file" {
@@ -326,19 +366,19 @@ resource "azurerm_linux_virtual_machine" "vm2" {
     destination = "/home/adminuser/install.sh"
   }
 
+
   provisioner "remote-exec" {
     inline = [
       "sed -i -e 's/\r$//' install.sh",
       "sudo chmod +x /home/adminuser/install.sh",
       "sudo /home/adminuser/install.sh",
-      "sudo chmod 666 /var/run/docker.sock",
     ]
   }
 }
 
 # Create 3rd virtual machine
 resource "azurerm_linux_virtual_machine" "vm3" {
-  name                            = "vm-we-03"
+  name                            = "worker-2"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic3.id]
@@ -378,8 +418,28 @@ resource "azurerm_linux_virtual_machine" "vm3" {
   }
 
   provisioner "file" {
-    source      = "./Ansible/playbook.yaml"
-    destination = "/home/adminuser/playbook.yaml"
+  source      = "./Ansible/initial.yml"
+  destination = "/home/adminuser/initial.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/kube-dependecies.yml"
+    destination = "/home/adminuser/kube-dependecies.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/hosts"
+    destination = "/home/adminuser/hosts"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/master.yml"
+    destination = "/home/adminuser/master.yml"
+  }
+
+  provisioner "file" {
+    source      = "./Ansible/workers.yml"
+    destination = "/home/adminuser/workers.yml"
   }
 
   provisioner "file" {
@@ -387,12 +447,12 @@ resource "azurerm_linux_virtual_machine" "vm3" {
     destination = "/home/adminuser/install.sh"
   }
 
+
   provisioner "remote-exec" {
     inline = [
       "sed -i -e 's/\r$//' install.sh",
       "sudo chmod +x /home/adminuser/install.sh",
       "sudo /home/adminuser/install.sh",
-      "sudo chmod 666 /var/run/docker.sock",
     ]
   }
 }

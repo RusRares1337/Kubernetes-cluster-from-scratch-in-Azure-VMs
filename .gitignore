@@ -17,4 +17,4 @@ terraform.rc
 crash.log
 
 # Ignore key.pem
-linuxkey.pem
+*.pem
