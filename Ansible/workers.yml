@@ -8,7 +8,7 @@
 
     - name: set join command
       set_fact:
-      join_command: "{{ join_command_raw.stdout_lines[0] }}"
+       join_command: "{{ join_command_raw.stdout_lines[0] }}"
 
 - hosts: workers
   become: yes
@@ -19,5 +19,5 @@
     - name: join cluster
       shell: "{{ hostvars['master'].join_command }} >> node_joined.txt"
       args:
-      chdir: $HOME
-      creates: node_joined.txt
+       chdir: $HOME
+       creates: node_joined.txt
