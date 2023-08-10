@@ -21,6 +21,3 @@ echo "Ansible installed"
 #ansible-playbook -i hosts workers.yml
 
 
-
-#echo "Running playbook"
-#ansible-playbook -u adminuser /home/adminuser/playbook.yaml
