@@ -56,7 +56,7 @@ stages:
               targetPath: '$(Pipeline.Workspace)/manifests'
           - task: KubernetesManifest@0
             inputs:
-              kubernetesServiceConnection: K8s
+              kubernetesServiceConnection: K8s-dev-cluster-1694517406855
               action: 'createSecret'
               namespace: 'default'
               secretType: 'dockerRegistry'
