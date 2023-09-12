@@ -41,7 +41,7 @@ stages:
     replicaNo: 1
   jobs:
   - deployment: Deploy
-    displayName: Deploy to AKS
+    displayName: Deploy to K8s
     environment: 'default.default'
     pool: 
       vmImage: ubuntu-latest
