@@ -5,7 +5,7 @@ resources:
 - repo: self
 
 pool:
-  vmImage: ubuntuVMagent
+  name: self-hosted
 
 variables:
   imageRepo: sampleapp
