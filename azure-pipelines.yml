@@ -42,7 +42,7 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: Deploy to K8s
-    environment: 'default.default'
+    environment: 'K8s.dev-cluster'
     pool: 
       vmImage: ubuntu-latest
     strategy:
