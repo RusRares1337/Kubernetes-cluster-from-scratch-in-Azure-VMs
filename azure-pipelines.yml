@@ -4,6 +4,9 @@ trigger:
 resources:
 - repo: self
 
+pool:
+  vmImage: ubuntuVMagent
+
 variables:
   imageRepo: sampleapp
   tag: '$(Build.BuildId)'
