@@ -4,8 +4,14 @@ metadata:
     name: sampleapp
     namespace: dev-cluster
 spec:
+  selector:
+    app.kubernetes.io/name: sampleapp
   ports:
-    - protocol: TCP
-      port: 80 
-      selector:
-        app: sampleapp
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 9376
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 9377
