@@ -58,7 +58,7 @@ stages:
             inputs:
               kubernetesServiceConnection: K8s-dev-cluster-1694517406855
               action: 'createSecret'
-              namespace: 'default'
+              namespace: 'dev-cluster'
               secretType: 'dockerRegistry'
               secretName: '$(acrsecret)'
               dockerRegistryEndpoint: 'acrtest123rares'
