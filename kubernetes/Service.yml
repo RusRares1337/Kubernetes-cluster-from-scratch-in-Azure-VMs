@@ -4,8 +4,8 @@ metadata:
     name: sampleapp
     namespace: dev-cluster
 spec:
-    type: LoadBalancer
-    ports:
-    - port: 80 
-    selector:
+  ports:
+    - protocol: TCP
+      port: 80 
+      selector:
         app: sampleapp
