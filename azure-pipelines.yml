@@ -17,8 +17,6 @@ stages:
   jobs:
   - job: Build
     displayName: Build
-    pool:
-      vmImage: ubuntu-latest
     steps:
     - task: Docker@2
       displayName: Build an image
@@ -46,8 +44,6 @@ stages:
   - deployment: Deploy
     displayName: Deploy to K8s
     environment: 'K8s.dev-cluster'
-    pool: 
-      vmImage: ubuntu-latest
     strategy:
       runOnce:
         deploy:
