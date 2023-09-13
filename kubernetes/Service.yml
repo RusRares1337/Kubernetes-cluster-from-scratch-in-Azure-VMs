@@ -1,11 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-    name: sampleapp
-    namespace: dev-cluster
+  name: sampleapp
+  namespace: dev-cluster
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal
 spec:
-    type: LoadBalancer
-    ports:
-    - port: 80 
-    selector:
-        app: sampleapp
+  type: LoadBalancer
+  loadBalancerIP: 10.0.1.5
+  loadBalancerSourceRanges:
+  - 10.0.1.5/24
+  selector:
+    app: sampleapp
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
