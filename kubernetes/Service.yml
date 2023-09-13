@@ -7,9 +7,9 @@ metadata:
     service.beta.kubernetes.io/azure-load-balancer-internal
 spec:
   type: LoadBalancer
-  loadBalancerIP: 10.0.1.5
+  loadBalancerIP: 20.16.183.176
   loadBalancerSourceRanges:
-  - 10.0.1.5/24
+  - 20.16.183.176/24
   selector:
     app: sampleapp
   ports:
