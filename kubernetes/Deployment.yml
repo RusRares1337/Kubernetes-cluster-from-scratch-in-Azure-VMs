@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: sampleapp 
-          image: acrtest123rares.azurecr.io/sampleapp
+          image: acrtest123rares.azurecr.io/sampleapp:latest
           ports:
           - containerPort: 80
