@@ -1,7 +1,7 @@
 **- Infrastructure -**
 
 - Create self-managed Kubernetes cluster on Azure VMs using Terraform and provisioned with Ansible playbooks
-- Use Ansible playbooks to update packages, install ansible and install kubeadm, docker and kubernetes dependencies on each node
+- Use Ansible playbooks to update and upgrade packages, install Ansible, install Docker and Kubernetes on each VM
 - As a security feature, disabled password authentification on each VM (login can be achieved only through ssh keys)
 
 
