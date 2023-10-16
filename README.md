@@ -7,7 +7,7 @@
 
 **- Networking -**
 
-- Apply following firewall rules on all created instances:
+- Apply firewall rules on all created instances:
   - Allow all traffic between VMs
   - Allow SSH access from local machine to all the VMs
   - Allow HTTP/HTTPS access from everywhere
