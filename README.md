@@ -1,15 +1,17 @@
-Infrastructure
+**Infrastructure**
 - Create self-managed Kubernetes cluster on Azure VMs using Terraform and provisioned with Ansible playbooks
 - Use Ansible playbooks to update packages, install ansible and install kubeadm, docker and kubernetes dependencies on each node
 - As a security feature, disabled password authentification on each VM (login can be achieved only through ssh keys)
 
-  Networking
+
+**Networking**
   - Allow all traffic between VMs
   - Allow SSH access from local machine to all the VMs
   - Allow HTTP/HTTPS access from everywhere
   - Add a firewall rule to only allow ICMP traffic from the VPN interface
 
-CI/CD
+
+**CI/CD**
 -Deploy an open-source application in a containerized and orchestrated form
 - Create shell scripts to build and deploy the image
 - Create docker/kubernetes files
