@@ -43,7 +43,7 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: Deploy to K8s
-    environment: 'K8s.dev-cluster'
+    environment: 'K8s.default'
     strategy:
       runOnce:
         deploy:
@@ -55,17 +55,17 @@ stages:
               targetPath: '$(Pipeline.Workspace)/manifests'
           - task: KubernetesManifest@0
             inputs:
-              kubernetesServiceConnection: K8s-dev-cluster-1694591430284
+              kubernetesServiceConnection: K8s-default-1697637149162
               action: 'createSecret'
-              namespace: 'dev-cluster'
+              namespace: 'default'
               secretType: 'dockerRegistry'
               secretName: '$(acrsecret)'
               dockerRegistryEndpoint: 'acrtest123rares'
           - task: KubernetesManifest@0
             inputs:
-              kubernetesServiceConnection: K8s-dev-cluster-1694591430284
+              kubernetesServiceConnection: K8s-default-1697637149162
               action: 'deploy'
-              namespace: 'dev-cluster'
+              namespace: 'default'
               manifests: |
                 $(Pipeline.Workspace)/manifests/Deployment.yml
                 $(Pipeline.Workspace)/manifests/Service.yml
