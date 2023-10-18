@@ -2,7 +2,7 @@ apiVersion : apps/v1
 kind: Deployment
 metadata:
   name: sampleapp 
-  namespace: dev-cluster
+  namespace: default
 spec:
   replicas: 1
   selector:
