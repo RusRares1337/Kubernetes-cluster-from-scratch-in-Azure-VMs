@@ -13,7 +13,7 @@ resource "local_file" "linux_key" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-project-we"
+  name     = "AVL-Rares-Testing"
   location = "West Europe"
 }
 
