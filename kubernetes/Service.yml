@@ -1,11 +1,14 @@
 apiVersion: v1
 kind: Service
-metadata:
-  name: my-service
+metadata:  
+  name: my-nodeport-service
 spec:
-  selector:
-    app.kubernetes.io/name: MyApp
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 9376
+  selector:    
+    app: sampleapp
+  type: NodePort
+  ports:  
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 30036
+    protocol: TCP
