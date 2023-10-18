@@ -1,4 +1,5 @@
 provider "azurerm" {
+  skip_provider_registration = "true"
   features {}
 }
 
@@ -12,23 +13,23 @@ resource "local_file" "linux_key" {
   content  = tls_private_key.linux_key.private_key_pem
 }
 
-resource "azurerm_resource_group" "rg" {
+data "azurerm_resource_group" "rg" {
   name     = "AVL-Rares-Testing"
-  location = "West Europe"
 }
+
 
 # Create virtual network
 resource "azurerm_virtual_network" "vnet" {
   name                = "vnet-we-01"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   address_space       = ["10.0.0.0/16"]
 }
 
 # Create 1st subnet
 resource "azurerm_subnet" "subnet1" {
   name                 = "subnet-01"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
   depends_on = [
@@ -39,7 +40,7 @@ resource "azurerm_subnet" "subnet1" {
 # Create 2nd subnet
 resource "azurerm_subnet" "subnet2" {
   name                 = "subnet-02"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.2.0/24"]
   depends_on = [
@@ -50,7 +51,7 @@ resource "azurerm_subnet" "subnet2" {
 # Create 3rd subnet
 resource "azurerm_subnet" "subnet3" {
   name                 = "subnet-03"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.3.0/24"]
   depends_on = [
@@ -61,33 +62,33 @@ resource "azurerm_subnet" "subnet3" {
 # Create 1st public IP
 resource "azurerm_public_ip" "publicIP1" {
   name                = "1stPublicIP"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
   depends_on = [
-    azurerm_resource_group.rg
+    data.azurerm_resource_group.rg
   ]
 }
 
 # Create 2nd public IP
 resource "azurerm_public_ip" "publicIP2" {
   name                = "2ndPublicIP"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
   depends_on = [
-    azurerm_resource_group.rg
+    data.azurerm_resource_group.rg
   ]
 }
 
 # Create 3rd public IP
 resource "azurerm_public_ip" "publicIP3" {
   name                = "3rdPublicIP"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
   depends_on = [
-    azurerm_resource_group.rg
+    data.azurerm_resource_group.rg
   ]
 }
 
@@ -95,8 +96,8 @@ resource "azurerm_public_ip" "publicIP3" {
 # Create 1st network interface
 resource "azurerm_network_interface" "nic1" {
   name                = "nic-vm1"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "internal"
@@ -114,8 +115,8 @@ resource "azurerm_network_interface" "nic1" {
 # Create 2nd network interface
 resource "azurerm_network_interface" "nic2" {
   name                = "nic-vm2"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "internal"
@@ -132,8 +133,8 @@ resource "azurerm_network_interface" "nic2" {
 # Create 3rd network interface
 resource "azurerm_network_interface" "nic3" {
   name                = "nic-vm3"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "internal"
@@ -150,8 +151,8 @@ resource "azurerm_network_interface" "nic3" {
 # Create network security group
 resource "azurerm_network_security_group" "nsg" {
   name                = "nsg-01"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   security_rule {
     name                       = "allow_ssh"
@@ -218,8 +219,8 @@ resource "azurerm_network_interface_security_group_association" "association3" {
 # Create 1st virtual machine
 resource "azurerm_linux_virtual_machine" "vm1" {
   name                            = "master-node"
-  location                        = azurerm_resource_group.rg.location
-  resource_group_name             = azurerm_resource_group.rg.name
+  location                        = data.azurerm_resource_group.rg.location
+  resource_group_name             = data.azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic1.id]
   size                            = "Standard_D2s_v3"
   admin_username                  = "adminuser"
@@ -299,8 +300,8 @@ resource "azurerm_linux_virtual_machine" "vm1" {
 # Create 2nd virtual machine
 resource "azurerm_linux_virtual_machine" "vm2" {
   name                            = "worker-1"
-  location                        = azurerm_resource_group.rg.location
-  resource_group_name             = azurerm_resource_group.rg.name
+  location                        = data.azurerm_resource_group.rg.location
+  resource_group_name             = data.azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic2.id]
   size                            = "Standard_DS1_v2"
   admin_username                  = "adminuser"
@@ -380,8 +381,8 @@ resource "azurerm_linux_virtual_machine" "vm2" {
 # Create 3rd virtual machine
 resource "azurerm_linux_virtual_machine" "vm3" {
   name                            = "worker-2"
-  location                        = azurerm_resource_group.rg.location
-  resource_group_name             = azurerm_resource_group.rg.name
+  location                        = data.azurerm_resource_group.rg.location
+  resource_group_name             = data.azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic3.id]
   size                            = "Standard_DS1_v2"
   admin_username                  = "adminuser"
