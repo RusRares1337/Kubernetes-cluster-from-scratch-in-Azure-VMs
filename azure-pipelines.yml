@@ -5,7 +5,7 @@ resources:
 - repo: self
 
 pool:
-  name: self-hosted
+  name: K8s
 
 variables:
   imageRepo: sampleapp
