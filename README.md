@@ -27,6 +27,7 @@
 
  
  **- Monitoring -**
+ 
 • Created and deployed a monitoring stack comprised of: Prometheus, Grafana with NodeExporter
 • Used Prometheus to monitor all infrastructure components as follows:
  - VMs resource usage (CPU,RAM,DISK,Network)
