@@ -55,7 +55,7 @@ stages:
               targetPath: '$(Pipeline.Workspace)/manifests'
           - task: KubernetesManifest@0
             inputs:
-              kubernetesServiceConnection: K8s-default-1697637149162
+              kubernetesServiceConnection: K8s-default-1697718002259
               action: 'createSecret'
               namespace: 'default'
               secretType: 'dockerRegistry'
@@ -63,7 +63,7 @@ stages:
               dockerRegistryEndpoint: 'acrtest123rares'
           - task: KubernetesManifest@0
             inputs:
-              kubernetesServiceConnection: K8s-default-1697637149162
+              kubernetesServiceConnection: K8s-default-1697718002259
               action: 'deploy'
               namespace: 'default'
               manifests: |
