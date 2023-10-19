@@ -112,10 +112,17 @@
         - docker-ce
         - docker-ce-cli
 
+    - name: check docker is active
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
     - name: Ensure group "docker" exists
       ansible.builtin.group:
         name: docker
         state: present
+
     - name: adding adminuser to docker group
       user:
         name: adminuser
