@@ -27,14 +27,13 @@
 
  
  **- Monitoring -**
- 
-• Created and deployed a monitoring stack comprised of: Prometheus, Grafana with NodeExporter
-• Used Prometheus to monitor all infrastructure components as follows:
- - VMs resource usage (CPU,RAM,DISK,Network)
- - Container resource usage (CPU,RAM,DISK,Network)
- - Network connectivity through the VPN tunnel between all the nodes
- - Setup monitoring jobs using service discovery where applicable
-• Setup cron jobson VMs that push metrics to Prometheus
-• Use Grafana to create an Infrastructure dashboard showing all the metrics collected using Prometheus
-• Create alert rules for critical metrics
-• Simulate a node failure and send alerts to email
+- Created and deployed a monitoring stack comprised of: Prometheus, Grafana with NodeExporter
+- Used Prometheus to monitor all infrastructure components as follows:
+   - VMs resource usage (CPU,RAM,DISK,Network)
+   - Container resource usage (CPU,RAM,DISK,Network)
+   - Network connectivity through the VPN tunnel between all the nodes
+   - Setup monitoring jobs using service discovery where applicable
+- Setup cron jobson VMs that push metrics to Prometheus
+- Use Grafana to create an Infrastructure dashboard showing all the metrics collected using Prometheus
+- Create alert rules for critical metrics
+- Simulate a node failure and send alerts to email
