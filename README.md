@@ -33,7 +33,7 @@
    - Container resource usage (CPU,RAM,DISK,Network)
    - Network connectivity through the VPN tunnel between all the nodes
    - Setup monitoring jobs using service discovery where applicable
-- Setup cron jobson VMs that push metrics to Prometheus
+- Setup cron jobs on VMs that push metrics to Prometheus
 - Use Grafana to create an Infrastructure dashboard showing all the metrics collected using Prometheus
 - Create alert rules for critical metrics
 - Simulate a node failure and send alerts to email
