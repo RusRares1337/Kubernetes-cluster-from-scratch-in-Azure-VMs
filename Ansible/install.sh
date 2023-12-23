@@ -7,10 +7,10 @@ sleep 3;
 echo "Ansible installed"
 
 #echo "Generate and send public key to workers"
-#sudo ssh-keygen -t rsa
-#ssh-copy-id adminuser@10.0.1.4
-#ssh-copy-id adminuser@10.0.2.4
-#ssh-copy-id adminuser@10.0.3.4
+sudo ssh-keygen -t rsa
+ssh-copy-id -i ~./shh/id_rsa.pub adminuser@10.0.1.4
+ssh-copy-id -i ~./shh/id_rsa.pub adminuser@10.0.2.4
+ssh-copy-id -i ~./shh/id_rsa.pub adminuser@10.0.3.4
 
 #ansible-playbook -i hosts initial.yml
 
