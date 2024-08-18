@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cicd-role
+  namespace: default #namespace-ul default e "default" fara sa mai specificam aici
+rules:
+- apiGroups:
+  - "" #pt "services" din "core" apiGroup fa create,update,list
+  resources:
+  - services
+  verbs:
+  - create
+  - update
+  - list
+- apiGroups:
+  - apps #pt "deployments" din "apps" apiGroup fa create,update,list
+  resources:
+  - deployments
+  verbs:
+  - create
+  - update
+  - list
