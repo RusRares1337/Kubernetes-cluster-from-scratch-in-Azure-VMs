@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-toleration
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  tolerations:
+#if taint "NoExecute" exist on a node, we want to tolerate with "operator: Exists"
+  - effect: NoExecute
+    operator: Exists 
+# make sure that scheduller will schedule to "minikube" node 
+  nodeNane: minikube
