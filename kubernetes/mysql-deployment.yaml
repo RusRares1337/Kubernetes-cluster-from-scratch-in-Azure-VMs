@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-db
+  labels:
+    app: my-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-db
+  template:
+    metadata:
+      labels:
+        app: my-db
+    spec:
+      containers:
+      - name: mysql
+        image: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: mypwd
+
+        volumeMounts: #volume mount to a specific container
+        - name: db-data
+          mountPath: "/var/lib/mysql"  #we mount into the container file-system
+          #when we take storage, we want to mount it into container
+
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: mysql-data-pvc 
