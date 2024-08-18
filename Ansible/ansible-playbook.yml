@@ -1,0 +1,31 @@
+- hosts: all
+  become: yes
+  roles:
+    - create_user
+  
+- hosts: all
+  become: yes
+  roles:
+    - kube_dependencies
+
+- hosts: master
+  become: yes
+  roles:
+    - master
+
+- hosts: workers
+  become: yes
+  roles:
+    - workers
+
+- name: Copy content of master .kube config into workers
+  hosts: all
+  tasks:
+    - name: Fetch the file from the master to ansible
+      run_once: yes
+      fetch: src=/etc/kubernetes/admin.conf dest=temp/ flat=yes
+      when: "{{ ansible_hostname == 'master' }}"
+    - name: Copy the file from the ansible to nodes
+      copy: src=temp/admin.conf dest=$HOME/.kube/config
+      when: "{{ ansible_hostname != 'master' }}"
+
