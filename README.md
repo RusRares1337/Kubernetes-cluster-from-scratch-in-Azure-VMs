@@ -24,9 +24,11 @@
 - Used Azure DevOps CI/CD tool to build,deploy and test the application
   - Configure a CI/CD agent on one node of the cluster
   - Create a CI/CD configuration file that will run the scripts created for build and deploy
+    
  
 **- Kubernetes -**
 - Deployment and configuration files
+- Prepared for CKA certification
 
  
  **- Monitoring -**
