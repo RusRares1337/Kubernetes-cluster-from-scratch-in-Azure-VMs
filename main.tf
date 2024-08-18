@@ -3,18 +3,9 @@ provider "azurerm" {
   features {}
 }
 
-resource "tls_private_key" "linux_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "local_file" "linux_key" {
-  filename = "linuxkey.pem"
-  content  = tls_private_key.linux_key.private_key_pem
-}
 
 data "azurerm_resource_group" "rg" {
-  name     = "AVL-Rares-Testing"
+  name     = "Rares-Testing"
 }
 
 
@@ -58,6 +49,7 @@ resource "azurerm_subnet" "subnet3" {
     azurerm_virtual_network.vnet
   ]
 }
+
 
 # Create 1st public IP
 resource "azurerm_public_ip" "publicIP1" {
@@ -148,9 +140,9 @@ resource "azurerm_network_interface" "nic3" {
   ]
 }
 
-# Create network security group
-resource "azurerm_network_security_group" "nsg" {
-  name                = "nsg-01"
+# Create network security group for master-node
+resource "azurerm_network_security_group" "nsg_master" {
+  name                = "master-nsg"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
@@ -189,32 +181,99 @@ resource "azurerm_network_security_group" "nsg" {
   }
 
   security_rule {
-    name                       = "port_icmp"
+    name                       = "k8s-api-server"
     priority                   = 130
     direction                  = "Inbound"
     access                     = "Allow"
-    protocol                   = "Icmp"
+    protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
+    destination_port_range     = "6443"
     source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+ security_rule {
+    name                       = "etcd-server-client-api"
+    priority                   = 140
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "2379-2380"
+    source_address_prefix      = "10.0.0.0/16"
+    destination_address_prefix = "*"
+  }
+
+ security_rule {
+    name                       = "api-scheduler-controller"
+    priority                   = 150
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10250-10252"
+    source_address_prefix      = "10.0.0.0/16"
     destination_address_prefix = "*"
   }
 }
 
+# Create network security group for worker-node
+resource "azurerm_network_security_group" "nsg_workers" {
+  name                = "workers-nsg"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "allow_ssh"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "kubelet-API"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10250"
+    source_address_prefix      = "10.0.0.0/16"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "NodePortServices"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "30000-32767"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+}
 resource "azurerm_network_interface_security_group_association" "association1" {
   network_interface_id      = azurerm_network_interface.nic1.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  network_security_group_id = azurerm_network_security_group.nsg_master.id
 }
 
 resource "azurerm_network_interface_security_group_association" "association2" {
   network_interface_id      = azurerm_network_interface.nic2.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  network_security_group_id = azurerm_network_security_group.nsg_workers.id
 }
 
 resource "azurerm_network_interface_security_group_association" "association3" {
   network_interface_id      = azurerm_network_interface.nic3.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  network_security_group_id = azurerm_network_security_group.nsg_workers.id
 }
+
 
 # Create 1st virtual machine
 resource "azurerm_linux_virtual_machine" "vm1" {
@@ -224,6 +283,10 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   network_interface_ids           = [azurerm_network_interface.nic1.id]
   size                            = "Standard_D2s_v3"
   admin_username                  = "adminuser"
+  admin_ssh_key {
+    username = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
   disable_password_authentication = true
 
   os_disk {
@@ -240,36 +303,29 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     version   = "latest"
   }
 
-  depends_on = [
+
+  depends_on = [ 
     azurerm_network_interface.nic1
   ]
-
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = tls_private_key.linux_key.public_key_openssh
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "adminuser"
-    private_key = tls_private_key.linux_key.private_key_pem
-    host        = azurerm_public_ip.publicIP1.ip_address
-
-  }
 }
 
 # Create 2nd virtual machine
 resource "azurerm_linux_virtual_machine" "vm2" {
-  name                            = "worker-1"
+  name                            = "worker-node1"
   location                        = data.azurerm_resource_group.rg.location
   resource_group_name             = data.azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic2.id]
-  size                            = "Standard_DS1_v2"
+  size                            = "Standard_D2s_v3"
   admin_username                  = "adminuser"
+  admin_ssh_key {
+    username = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
   disable_password_authentication = true
 
   os_disk {
     name                 = "OsDisk2"
+    disk_size_gb         = 128
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -280,38 +336,25 @@ resource "azurerm_linux_virtual_machine" "vm2" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
-
-  depends_on = [
-    azurerm_linux_virtual_machine.vm1,
-    azurerm_network_interface.nic2,
-  ]
-
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = tls_private_key.linux_key.public_key_openssh
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "adminuser"
-    private_key = tls_private_key.linux_key.private_key_pem
-    host        = azurerm_public_ip.publicIP2.ip_address
-
-  }
-}
+ }
 
 # Create 3rd virtual machine
 resource "azurerm_linux_virtual_machine" "vm3" {
-  name                            = "worker-2"
+  name                            = "worker-node2"
   location                        = data.azurerm_resource_group.rg.location
   resource_group_name             = data.azurerm_resource_group.rg.name
   network_interface_ids           = [azurerm_network_interface.nic3.id]
-  size                            = "Standard_DS1_v2"
+  size                            = "Standard_D2s_v3"
   admin_username                  = "adminuser"
+  admin_ssh_key {
+    username = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
   disable_password_authentication = true
 
   os_disk {
     name                 = "OsDisk3"
+    disk_size_gb         = 128
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -322,22 +365,5 @@ resource "azurerm_linux_virtual_machine" "vm3" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
-
-  depends_on = [
-    azurerm_linux_virtual_machine.vm2,
-    azurerm_network_interface.nic3,
-  ]
-
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = tls_private_key.linux_key.public_key_openssh
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "adminuser"
-    private_key = tls_private_key.linux_key.private_key_pem
-    host        = azurerm_public_ip.publicIP3.ip_address
-
-  }
-}
+ }
+ 
