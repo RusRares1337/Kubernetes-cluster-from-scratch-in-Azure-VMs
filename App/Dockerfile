@@ -9,7 +9,7 @@ RUN dotnet restore
 COPY SampleWebApp/. .
 RUN dotnet publish -c release -o /WebApp --no-restore
 
-# Final stage / image
+# Final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /WebApp
 COPY --from=build /WebApp ./
