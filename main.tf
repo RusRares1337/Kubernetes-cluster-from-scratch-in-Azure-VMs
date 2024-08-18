@@ -256,45 +256,6 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     host        = azurerm_public_ip.publicIP1.ip_address
 
   }
-
-  provisioner "file" {
-  source      = "./Ansible/initial.yml"
-  destination = "/home/adminuser/initial.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/kube-dependecies.yml"
-    destination = "/home/adminuser/kube-dependecies.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/hosts"
-    destination = "/home/adminuser/hosts"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/master.yml"
-    destination = "/home/adminuser/master.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/workers.yml"
-    destination = "/home/adminuser/workers.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/install.sh"
-    destination = "/home/adminuser/install.sh"
-  }
-
-
-  provisioner "remote-exec" {
-    inline = [
-      "sed -i -e 's/\r$//' install.sh",
-      "sudo chmod +x /home/adminuser/install.sh",
-      "sudo /home/adminuser/install.sh",
-    ]
-  }
 }
 
 # Create 2nd virtual machine
@@ -337,45 +298,6 @@ resource "azurerm_linux_virtual_machine" "vm2" {
     host        = azurerm_public_ip.publicIP2.ip_address
 
   }
-
-  provisioner "file" {
-  source      = "./Ansible/initial.yml"
-  destination = "/home/adminuser/initial.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/kube-dependecies.yml"
-    destination = "/home/adminuser/kube-dependecies.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/hosts"
-    destination = "/home/adminuser/hosts"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/master.yml"
-    destination = "/home/adminuser/master.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/workers.yml"
-    destination = "/home/adminuser/workers.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/install.sh"
-    destination = "/home/adminuser/install.sh"
-  }
-
-
-  provisioner "remote-exec" {
-    inline = [
-      "sed -i -e 's/\r$//' install.sh",
-      "sudo chmod +x /home/adminuser/install.sh",
-      "sudo /home/adminuser/install.sh",
-    ]
-  }
 }
 
 # Create 3rd virtual machine
@@ -417,44 +339,5 @@ resource "azurerm_linux_virtual_machine" "vm3" {
     private_key = tls_private_key.linux_key.private_key_pem
     host        = azurerm_public_ip.publicIP3.ip_address
 
-  }
-
-  provisioner "file" {
-  source      = "./Ansible/initial.yml"
-  destination = "/home/adminuser/initial.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/kube-dependecies.yml"
-    destination = "/home/adminuser/kube-dependecies.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/hosts"
-    destination = "/home/adminuser/hosts"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/master.yml"
-    destination = "/home/adminuser/master.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/workers.yml"
-    destination = "/home/adminuser/workers.yml"
-  }
-
-  provisioner "file" {
-    source      = "./Ansible/install.sh"
-    destination = "/home/adminuser/install.sh"
-  }
-
-
-  provisioner "remote-exec" {
-    inline = [
-      "sed -i -e 's/\r$//' install.sh",
-      "sudo chmod +x /home/adminuser/install.sh",
-      "sudo /home/adminuser/install.sh",
-    ]
   }
 }
