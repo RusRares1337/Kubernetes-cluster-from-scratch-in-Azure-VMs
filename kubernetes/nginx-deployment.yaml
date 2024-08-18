@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+      - name: log-sidecar
+        image: busybox
+        # executed in a endless loop every 20secs, log sidecar container will run as long as the pod is alive.
+        # "command" face overwrite la tot ce e in cmd dockerfile
+        # expose some of the values inside the log-sidecar container, adaugam atribut "env", key-value pair
+        command: ['sh', '-c'] 
+        args: 
+        - while true; do 
+            echo sync app logs; 
+            printenv POD_NAME POD_SERVICE_ACCOUNT POD_IP; 
+            sleep 20; 
+          done;
+        env: 
+        - name: POD_NAME
+          # points to the path that holds the atribute of that value
+          valueFrom: 
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        #toate aceste 3 valori din "nginx container" vor fi valabile in "log-sidecar" container
