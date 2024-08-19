@@ -11,7 +11,7 @@
   - Allow all traffic between VMs
   - Allow SSH access from local machine to all the VMs
   - Allow HTTP/HTTPS access from everywhere
-  - Add a firewall rule to only allow ICMP traffic from the VPN interface
+  - Allow Kubernetes arhitecture communication - Master node: API server, Schedulere and ETCD; Worker node - kubelet API and NodePort Services
 
 
 **- CI/CD -**
