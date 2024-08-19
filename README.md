@@ -28,7 +28,7 @@
  
 **- Kubernetes -**
 - Deployment and configuration files
-- Prepared for CKA certification
+- Prepared for Certified Kubernetes Admin (CKA) certification
 
  
  **- Monitoring -**
