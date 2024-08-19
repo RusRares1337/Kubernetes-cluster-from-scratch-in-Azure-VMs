@@ -11,7 +11,7 @@
   - Allow all traffic between VMs
   - Allow SSH access from local machine to all the VMs
   - Allow HTTP/HTTPS access from everywhere
-  - Allow Kubernetes arhitecture communication - Master node: API server, Schedulere and ETCD; Worker node - kubelet API and NodePort Services
+  - Allow Kubernetes arhitecture communication - Master node: API server, Scheduler and ETCD; Worker node: Kubelet API and NodePort Services
 
 
 **- CI/CD -**
